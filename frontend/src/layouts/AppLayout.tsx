@@ -13,7 +13,7 @@ import {
   Content,
   SkipToContent,
 } from "@carbon/react";
-import { Logout, UserAvatar } from "@carbon/icons-react";
+import { Logout, UserAvatar, Menu, Close } from "@carbon/icons-react";
 import { useAuthStore } from "@/store/auth.store";
 import { NAV_MODULES } from "./navConfig";
 
@@ -32,38 +32,30 @@ export function AppLayout() {
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header aria-label="Firedrive Platform">
         <SkipToContent />
-        {/* Custom hamburger — Carbon's HeaderMenuButton is hidden at desktop breakpoints */}
+        {/* Custom hamburger — always visible at all breakpoints */}
         <button
           aria-label={sideNavExpanded ? "Close menu" : "Open menu"}
           onClick={() => setSideNavExpanded((prev) => !prev)}
           style={{
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
             alignItems: "center",
-            gap: "5px",
+            justifyContent: "center",
             width: "3rem",
             height: "3rem",
+            minWidth: "3rem",
             background: "transparent",
             border: "none",
             cursor: "pointer",
             padding: "0",
             flexShrink: 0,
+            color: "#ffffff",
+            fill: "#ffffff",
           }}
         >
-          {sideNavExpanded ? (
-            // X icon when open
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M4 4L16 16M16 4L4 16" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          ) : (
-            // Hamburger lines when closed
-            <>
-              <span style={{ width: "18px", height: "2px", background: "white", borderRadius: "1px", display: "block" }} />
-              <span style={{ width: "18px", height: "2px", background: "white", borderRadius: "1px", display: "block" }} />
-              <span style={{ width: "18px", height: "2px", background: "white", borderRadius: "1px", display: "block" }} />
-            </>
-          )}
+          {sideNavExpanded
+            ? <Close size={20} style={{ fill: "#ffffff", color: "#ffffff" }} />
+            : <Menu size={20} style={{ fill: "#ffffff", color: "#ffffff" }} />
+          }
         </button>
         <HeaderName href="/dashboard" prefix="">
           🔥 Firedrive
