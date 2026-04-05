@@ -72,7 +72,7 @@ export default function LoginPage() {
       <Tile style={{ padding: "3rem 2.5rem" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
           <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🔥</div>
-          <Heading style={{ fontSize: "1.75rem", fontWeight: 700 }}>Fireverse</Heading>
+          <Heading style={{ fontSize: "1.75rem", fontWeight: 700 }}>Firedrive</Heading>
           <p style={{ color: "var(--cds-text-secondary)", marginTop: "0.5rem", fontSize: "0.875rem" }}>
             Fire / Public Safety Management System
           </p>
@@ -97,7 +97,7 @@ export default function LoginPage() {
               id="email"
               labelText="Email Address"
               type="email"
-              placeholder="superadmin@fireverse.gov.in"
+              placeholder="superadmin@firedrive.gov.in"
               invalid={!!errors.email}
               invalidText={errors.email?.message}
               {...register("email")}
@@ -122,7 +122,7 @@ export default function LoginPage() {
         </Form>
 
         <p style={{ textAlign: "center", marginTop: "2rem", fontSize: "0.75rem", color: "var(--cds-text-helper)" }}>
-          Super Admin: superadmin@fireverse.gov.in / Fire@Admin#2026
+          Super Admin: superadmin@firedrive.gov.in / Fire@Admin#2026
         </p>
       </Tile>
     </div>

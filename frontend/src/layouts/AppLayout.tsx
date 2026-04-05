@@ -28,10 +28,10 @@ export function AppLayout() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header aria-label="Fireverse Platform">
+      <Header aria-label="Firedrive Platform">
         <SkipToContent />
         <HeaderName href="/dashboard" prefix="">
-          🔥 Fireverse
+          🔥 Firedrive
         </HeaderName>
         <HeaderGlobalBar>
           <HeaderGlobalAction aria-label={user ? `${user.firstName} ${user.lastName}` : "User"} tooltipAlignment="end">

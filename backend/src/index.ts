@@ -42,13 +42,13 @@ app.use("/api/mock-drill", mockDrillRoutes);
 app.use("/api/audit", auditRoutes);
 
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", version: "1.1.0", service: "Fireverse Backend" });
+  res.json({ status: "ok", version: "1.1.0", service: "Firedrive Backend" });
 });
 
 app.use(errorHandler);
 
 app.listen(env.port, () => {
-  logger.info(`🔥 Fireverse backend running on port ${env.port}`);
+  logger.info(`🔥 Firedrive backend running on port ${env.port}`);
   logger.info(`   Environment: ${env.nodeEnv}`);
   logger.info(`   Frontend URL: ${env.frontendUrl}`);
 });

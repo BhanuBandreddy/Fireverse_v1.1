@@ -30,6 +30,6 @@ export const useAuthStore = create<AuthState>()(
       setAccessToken: (accessToken) => set({ accessToken }),
       logout: () => set({ user: null, accessToken: null, refreshToken: null }),
     }),
-    { name: "fireverse-auth" }
+    { name: "firedrive-auth" }
   )
 );

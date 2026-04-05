@@ -30,10 +30,10 @@ interface SystemUser {
 }
 
 const MOCK_ROWS: SystemUser[] = [
-  { id: "1", username: "superadmin", email: "superadmin@fireverse.gov.in", role: "Super Admin", status: "ACTIVE", lastLogin: "2026-04-04 09:15" },
-  { id: "2", username: "fire_chief", email: "chief@fireverse.gov.in", role: "Fire Chief", status: "ACTIVE", lastLogin: "2026-04-03 18:30" },
-  { id: "3", username: "noc_officer", email: "noc@fireverse.gov.in", role: "NOC Officer", status: "ACTIVE", lastLogin: "2026-04-04 08:45" },
-  { id: "4", username: "audit_inspector", email: "audit@fireverse.gov.in", role: "Audit Inspector", status: "INACTIVE", lastLogin: "2026-03-28 14:00" },
+  { id: "1", username: "superadmin", email: "superadmin@firedrive.gov.in", role: "Super Admin", status: "ACTIVE", lastLogin: "2026-04-04 09:15" },
+  { id: "2", username: "fire_chief", email: "chief@firedrive.gov.in", role: "Fire Chief", status: "ACTIVE", lastLogin: "2026-04-03 18:30" },
+  { id: "3", username: "noc_officer", email: "noc@firedrive.gov.in", role: "NOC Officer", status: "ACTIVE", lastLogin: "2026-04-04 08:45" },
+  { id: "4", username: "audit_inspector", email: "audit@firedrive.gov.in", role: "Audit Inspector", status: "INACTIVE", lastLogin: "2026-03-28 14:00" },
 ];
 
 const headers = [

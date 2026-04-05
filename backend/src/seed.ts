@@ -15,7 +15,7 @@ const ALL_RESOURCES = [
 ];
 
 async function main() {
-  console.log("🌱 Seeding Fireverse database...");
+  console.log("🌱 Seeding Firedrive database...");
 
   // Create all permissions
   for (const module of ALL_MODULES) {
@@ -85,10 +85,10 @@ async function main() {
   // Create Super Admin user
   const passwordHash = await bcrypt.hash("Fire@Admin#2026", 12);
   const superAdmin = await prisma.user.upsert({
-    where: { email: "superadmin@fireverse.gov.in" },
+    where: { email: "superadmin@firedrive.gov.in" },
     update: {},
     create: {
-      email: "superadmin@fireverse.gov.in",
+      email: "superadmin@firedrive.gov.in",
       username: "superadmin",
       passwordHash,
       firstName: "Super",
@@ -168,7 +168,7 @@ async function main() {
   console.log("\n🎉 Seed complete!");
   console.log("─────────────────────────────────────────");
   console.log("   Super Admin Login:");
-  console.log("   Email:    superadmin@fireverse.gov.in");
+  console.log("   Email:    superadmin@firedrive.gov.in");
   console.log("   Password: Fire@Admin#2026");
   console.log("─────────────────────────────────────────");
 }
