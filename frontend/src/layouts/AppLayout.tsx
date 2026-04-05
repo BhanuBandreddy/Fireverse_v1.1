@@ -1,21 +1,19 @@
 import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
-  Header,
-  HeaderName,
-  HeaderGlobalBar,
-  HeaderGlobalAction,
   SideNav,
   SideNavItems,
   SideNavMenu,
   SideNavMenuItem,
   SideNavLink,
-  Content,
-  SkipToContent,
 } from "@carbon/react";
 import { Logout, UserAvatar, Menu, Close } from "@carbon/icons-react";
 import { useAuthStore } from "@/store/auth.store";
 import { NAV_MODULES } from "./navConfig";
+
+const HEADER_HEIGHT = "48px";
+const HEADER_BG = "#161616";
+const HEADER_TEXT = "#f4f4f4";
 
 export function AppLayout() {
   const { logout } = useAuthStore();
@@ -30,73 +28,122 @@ export function AppLayout() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header aria-label="Firedrive Platform">
-        <SkipToContent />
-        {/* Custom hamburger — always visible at all breakpoints */}
+
+      {/* ── Fully custom header — no Carbon Header component ── */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: HEADER_HEIGHT,
+          background: HEADER_BG,
+          display: "flex",
+          alignItems: "center",
+          zIndex: 8000,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
+        }}
+      >
+        {/* Hamburger toggle */}
         <button
           aria-label={sideNavExpanded ? "Close menu" : "Open menu"}
           onClick={() => setSideNavExpanded((prev) => !prev)}
           style={{
+            width: HEADER_HEIGHT,
+            height: HEADER_HEIGHT,
+            minWidth: HEADER_HEIGHT,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "3rem",
-            height: "3rem",
-            minWidth: "3rem",
-            background: "transparent",
+            background: sideNavExpanded ? "#393939" : "transparent",
             border: "none",
             cursor: "pointer",
-            padding: "0",
             flexShrink: 0,
-            color: "#ffffff",
-            fill: "#ffffff",
+            transition: "background 0.15s ease",
           }}
         >
           {sideNavExpanded
-            ? <Close size={20} style={{ fill: "#ffffff", color: "#ffffff" }} />
-            : <Menu size={20} style={{ fill: "#ffffff", color: "#ffffff" }} />
+            ? <Close size={20} style={{ fill: HEADER_TEXT }} />
+            : <Menu size={20} style={{ fill: HEADER_TEXT }} />
           }
         </button>
-        <HeaderName href="/dashboard" prefix="">
-          🔥 Firedrive
-        </HeaderName>
-        <HeaderGlobalBar>
-          <HeaderGlobalAction
-            aria-label="User Profile"
-            tooltipAlignment="end"
-          >
-            <UserAvatar size={20} />
-          </HeaderGlobalAction>
-          <HeaderGlobalAction aria-label="Logout" tooltipAlignment="end" onClick={handleLogout}>
-            <Logout size={20} />
-          </HeaderGlobalAction>
-        </HeaderGlobalBar>
-      </Header>
 
-      {/* Backdrop — closes sidebar when clicking outside */}
+        {/* Brand name */}
+        <a
+          href="/dashboard"
+          style={{
+            color: HEADER_TEXT,
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: "0.875rem",
+            letterSpacing: "0.01em",
+            paddingLeft: "0.5rem",
+            flex: 1,
+          }}
+        >
+          🔥 Firedrive
+        </a>
+
+        {/* Right actions */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <button
+            aria-label="User Profile"
+            style={{
+              width: HEADER_HEIGHT,
+              height: HEADER_HEIGHT,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            <UserAvatar size={20} style={{ fill: HEADER_TEXT }} />
+          </button>
+          <button
+            aria-label="Logout"
+            onClick={handleLogout}
+            style={{
+              width: HEADER_HEIGHT,
+              height: HEADER_HEIGHT,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            <Logout size={20} style={{ fill: HEADER_TEXT }} />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Backdrop ── */}
       {sideNavExpanded && (
         <div
           onClick={() => setSideNavExpanded(false)}
           style={{
             position: "fixed",
-            top: "3rem",
+            top: HEADER_HEIGHT,
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.5)",
-            zIndex: 5999,
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 6000,
           }}
         />
       )}
 
-      {/* Collapsible overlay sidebar */}
+      {/* ── Collapsible overlay sidebar ── */}
       <SideNav
         aria-label="Side navigation"
         isFixedNav
         expanded={sideNavExpanded}
         style={{
-          top: "3rem",
-          zIndex: 6000,
+          top: HEADER_HEIGHT,
+          zIndex: 7000,
           transform: sideNavExpanded ? "translateX(0)" : "translateX(-100%)",
           transition: "transform 0.2s ease",
           width: "16rem",
@@ -137,18 +184,18 @@ export function AppLayout() {
         </SideNavItems>
       </SideNav>
 
-      {/* Content always takes full width */}
-      <Content
+      {/* ── Page content ── */}
+      <main
         style={{
           flex: 1,
-          marginLeft: 0,
-          paddingTop: "calc(3rem + 2rem)",
-          padding: "calc(3rem + 2rem) 2rem 2rem",
-          background: "var(--cds-background)",
+          marginTop: HEADER_HEIGHT,
+          padding: "2rem",
+          background: "var(--cds-background, #f4f4f4)",
+          minHeight: `calc(100vh - ${HEADER_HEIGHT})`,
         }}
       >
         <Outlet />
-      </Content>
+      </main>
     </div>
   );
 }
