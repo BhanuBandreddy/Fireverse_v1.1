@@ -7,7 +7,7 @@ export function validate(schema: ZodSchema) {
     const result = schema.safeParse(req.body);
     if (!result.success) {
       const msg = result.error.issues
-        .map((e: { path: (string | number)[]; message: string }) => `${e.path.join(".")}: ${e.message}`)
+        .map((e) => `${e.path.map(String).join(".")}: ${e.message}`)
         .join(", ");
       fail(res, msg, 400);
       return;
