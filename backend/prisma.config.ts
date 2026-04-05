@@ -5,6 +5,9 @@ import { Pool } from "pg";
 
 export default defineConfig({
   schema: path.join("prisma", "schema.prisma"),
+  datasource: {
+    url: process.env.DATABASE_URL!,
+  },
   migrate: {
     adapter: () => {
       const pool = new Pool({ connectionString: process.env.DATABASE_URL });
