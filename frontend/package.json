@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "serve -s dist -l $PORT"
   },
   "dependencies": {
+    "serve": "^14.2.4",
     "@carbon/charts-react": "^1.27.3",
     "@carbon/icons-react": "^11.77.1",
     "@carbon/react": "^1.104.1",
