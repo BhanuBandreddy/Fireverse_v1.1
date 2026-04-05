@@ -82,11 +82,12 @@ async function main() {
   });
   console.log("✅ Default organization seeded");
 
-  // Create Super Admin user
+  // Create Super Admin user — upsert by username to handle email renames
   const passwordHash = await bcrypt.hash("Fire@Admin#2026", 12);
+  const existingAdmin = await prisma.user.findFirst({ where: { username: "superadmin" } });
   const superAdmin = await prisma.user.upsert({
-    where: { email: "superadmin@firedrive.gov.in" },
-    update: {},
+    where: { email: existingAdmin?.email ?? "superadmin@firedrive.gov.in" },
+    update: { email: "superadmin@firedrive.gov.in" },
     create: {
       email: "superadmin@firedrive.gov.in",
       username: "superadmin",
