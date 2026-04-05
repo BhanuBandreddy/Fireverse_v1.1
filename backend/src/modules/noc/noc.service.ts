@@ -1,17 +1,13 @@
 import { prisma } from "../../lib/prisma";
 
-
 export async function getDashboardStats() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const [total, pending, approved, certificates] = await Promise.all([
+  const [total, pending, approved, underReview] = await Promise.all([
     prisma.nOCApplication.count(),
     prisma.nOCApplication.count({ where: { status: "PENDING" } }),
     prisma.nOCApplication.count({ where: { status: "APPROVED" } }),
-    prisma.nOCApplication.count({ where: { status: "CERTIFICATE_ISSUED" } }),
+    prisma.nOCApplication.count({ where: { status: "UNDER_REVIEW" } }),
   ]);
-  return { total, pending, approved, certificates };
+  return { total, pending, approved, underReview };
 }
 
 export async function getApplications(skip: number, take: number, search: string) {
@@ -24,12 +20,7 @@ export async function getApplications(skip: number, take: number, search: string
       }
     : {};
   const [data, total] = await Promise.all([
-    prisma.nOCApplication.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.nOCApplication.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
     prisma.nOCApplication.count({ where }),
   ]);
   return { data, total };
@@ -38,11 +29,7 @@ export async function getApplications(skip: number, take: number, search: string
 export async function getApplication(id: string) {
   return prisma.nOCApplication.findUnique({
     where: { id },
-    include: {
-      documents: true,
-      payments: true,
-      inspections: true,
-    },
+    include: { documents: true, payments: true, inspections: true },
   });
 }
 
@@ -65,24 +52,15 @@ export async function deleteApplication(id: string) {
 
 export async function getCertificates(skip: number, take: number) {
   const [data, total] = await Promise.all([
-    prisma.nOCApplication.findMany({
-      where: { status: "CERTIFICATE_ISSUED" },
-      skip,
-      take,
-      orderBy: { updatedAt: "desc" },
-    }),
-    prisma.nOCApplication.count({ where: { status: "CERTIFICATE_ISSUED" } }),
+    prisma.nOCCertificate.findMany({ skip, take, orderBy: { issuedAt: "desc" } }),
+    prisma.nOCCertificate.count(),
   ]);
   return { data, total };
 }
 
 export async function getFees(skip: number, take: number) {
   const [data, total] = await Promise.all([
-    prisma.nOCFee.findMany({
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.nOCFee.findMany({ skip, take, orderBy: { effectiveFrom: "desc" } }),
     prisma.nOCFee.count(),
   ]);
   return { data, total };

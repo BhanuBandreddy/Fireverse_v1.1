@@ -1,6 +1,5 @@
 import { prisma } from "../../lib/prisma";
 
-
 export async function getDashboardStats() {
   const [firms, applications, pending, approved] = await Promise.all([
     prisma.firm.count(),
@@ -15,18 +14,13 @@ export async function getFirms(skip: number, take: number, search: string) {
   const where = search
     ? {
         OR: [
-          { name: { contains: search, mode: "insensitive" as const } },
-          { registrationNo: { contains: search, mode: "insensitive" as const } },
+          { firmName: { contains: search, mode: "insensitive" as const } },
+          { firmCode: { contains: search, mode: "insensitive" as const } },
         ],
       }
     : {};
   const [data, total] = await Promise.all([
-    prisma.firm.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.firm.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
     prisma.firm.count({ where }),
   ]);
   return { data, total };
@@ -40,21 +34,10 @@ export async function createFirm(data: Record<string, unknown>) {
 
 export async function getApplications(skip: number, take: number, search: string) {
   const where = search
-    ? {
-        OR: [
-          { applicationNo: { contains: search, mode: "insensitive" as const } },
-          { firm: { name: { contains: search, mode: "insensitive" as const } } },
-        ],
-      }
+    ? { refNo: { contains: search, mode: "insensitive" as const } }
     : {};
   const [data, total] = await Promise.all([
-    prisma.renewalApplication.findMany({
-      where,
-      skip,
-      take,
-      include: { firm: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.renewalApplication.findMany({ where, skip, take, include: { firm: true }, orderBy: { createdAt: "desc" } }),
     prisma.renewalApplication.count({ where }),
   ]);
   return { data, total };

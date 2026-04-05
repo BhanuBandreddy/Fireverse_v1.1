@@ -17,7 +17,7 @@ export async function listScheduled(req: Request, res: Response, next: NextFunct
 
 export async function getScheduled(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getScheduledInspection(req.params["id"]!);
+    const item = await svc.getScheduledInspection(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -48,5 +48,5 @@ export async function listDeviations(req: Request, res: Response, next: NextFunc
 }
 
 export async function updateDeviation(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateDeviation(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateDeviation(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }

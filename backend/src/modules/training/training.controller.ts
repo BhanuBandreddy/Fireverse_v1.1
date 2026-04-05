@@ -17,7 +17,7 @@ export async function listSchedules(req: Request, res: Response, next: NextFunct
 
 export async function getSchedule(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getSchedule(req.params["id"]!);
+    const item = await svc.getSchedule(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -28,7 +28,7 @@ export async function createSchedule(req: Request, res: Response, next: NextFunc
 }
 
 export async function updateSchedule(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateSchedule(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateSchedule(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function listCourses(req: Request, res: Response, next: NextFunction): Promise<void> {

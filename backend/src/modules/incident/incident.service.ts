@@ -1,6 +1,5 @@
 import { prisma } from "../../lib/prisma";
 
-
 export async function getDashboardStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -10,10 +9,8 @@ export async function getDashboardStats() {
   const [open, inProgress, closedToday, critical] = await Promise.all([
     prisma.incident.count({ where: { status: "OPEN" } }),
     prisma.incident.count({ where: { status: "IN_PROGRESS" } }),
-    prisma.incident.count({
-      where: { status: "CLOSED", closedAt: { gte: today, lt: tomorrow } },
-    }),
-    prisma.incident.count({ where: { severity: "CRITICAL" } }),
+    prisma.incident.count({ where: { status: "CLOSED", closedAt: { gte: today, lt: tomorrow } } }),
+    prisma.incident.count({ where: { priority: "CRITICAL" } }),
   ]);
   return { open, inProgress, closedToday, critical };
 }
@@ -24,7 +21,7 @@ export async function getIncidents(skip: number, take: number, search: string) {
         OR: [
           { title: { contains: search, mode: "insensitive" as const } },
           { incidentNo: { contains: search, mode: "insensitive" as const } },
-          { location: { contains: search, mode: "insensitive" as const } },
+          { address: { contains: search, mode: "insensitive" as const } },
         ],
       }
     : {};
@@ -33,7 +30,7 @@ export async function getIncidents(skip: number, take: number, search: string) {
       where,
       skip,
       take,
-      include: { type: true, category: true, reportedBy: true },
+      include: { type: true, category: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.incident.count({ where }),
@@ -44,13 +41,7 @@ export async function getIncidents(skip: number, take: number, search: string) {
 export async function getIncident(id: string) {
   return prisma.incident.findUnique({
     where: { id },
-    include: {
-      type: true,
-      category: true,
-      reportedBy: true,
-      actions: true,
-      attachments: true,
-    },
+    include: { type: true, category: true },
   });
 }
 

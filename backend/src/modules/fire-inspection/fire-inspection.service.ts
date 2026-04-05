@@ -1,6 +1,5 @@
 import { prisma } from "../../lib/prisma";
 
-
 export async function getDashboardStats() {
   const [scheduled, inProgress, completed, openDeviations] = await Promise.all([
     prisma.scheduledInspection.count({ where: { status: "SCHEDULED" } }),
@@ -13,20 +12,15 @@ export async function getDashboardStats() {
 
 export async function getScheduledInspections(skip: number, take: number, search: string) {
   const where = search
-    ? {
-        OR: [
-          { inspectionNo: { contains: search, mode: "insensitive" as const } },
-          { location: { contains: search, mode: "insensitive" as const } },
-        ],
-      }
+    ? { title: { contains: search, mode: "insensitive" as const } }
     : {};
   const [data, total] = await Promise.all([
     prisma.scheduledInspection.findMany({
       where,
       skip,
       take,
-      include: { assignedTo: true },
-      orderBy: { scheduledDate: "desc" },
+      include: { results: true },
+      orderBy: { scheduledAt: "desc" },
     }),
     prisma.scheduledInspection.count({ where }),
   ]);
@@ -36,11 +30,7 @@ export async function getScheduledInspections(skip: number, take: number, search
 export async function getScheduledInspection(id: string) {
   return prisma.scheduledInspection.findUnique({
     where: { id },
-    include: {
-      assignedTo: true,
-      checklists: true,
-      deviations: true,
-    },
+    include: { results: true },
   });
 }
 
@@ -62,13 +52,7 @@ export async function getChecklists(skip: number, take: number, search: string) 
     ? { name: { contains: search, mode: "insensitive" as const } }
     : {};
   const [data, total] = await Promise.all([
-    prisma.inspectionChecklist.findMany({
-      where,
-      skip,
-      take,
-      include: { items: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.inspectionChecklist.findMany({ where, skip, take, include: { tasks: true }, orderBy: { name: "asc" } }),
     prisma.inspectionChecklist.count({ where }),
   ]);
   return { data, total };
@@ -82,21 +66,10 @@ export async function createChecklist(data: Record<string, unknown>) {
 
 export async function getDeviations(skip: number, take: number, search: string) {
   const where = search
-    ? {
-        OR: [
-          { deviationNo: { contains: search, mode: "insensitive" as const } },
-          { description: { contains: search, mode: "insensitive" as const } },
-        ],
-      }
+    ? { description: { contains: search, mode: "insensitive" as const } }
     : {};
   const [data, total] = await Promise.all([
-    prisma.deviation.findMany({
-      where,
-      skip,
-      take,
-      include: { inspection: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.deviation.findMany({ where, skip, take, include: { deviationType: true }, orderBy: { createdAt: "desc" } }),
     prisma.deviation.count({ where }),
   ]);
   return { data, total };

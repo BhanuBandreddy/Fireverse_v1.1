@@ -17,7 +17,7 @@ export async function listDrills(req: Request, res: Response, next: NextFunction
 
 export async function getDrill(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getDrill(req.params["id"]!);
+    const item = await svc.getDrill(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -28,7 +28,7 @@ export async function createDrill(req: Request, res: Response, next: NextFunctio
 }
 
 export async function updateDrill(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateDrill(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateDrill(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function listTypes(_req: Request, res: Response, next: NextFunction): Promise<void> {

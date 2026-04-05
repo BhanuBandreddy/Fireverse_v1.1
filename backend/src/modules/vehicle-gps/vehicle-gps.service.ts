@@ -1,15 +1,12 @@
 import { prisma } from "../../lib/prisma";
 
-
 export async function getDashboardStats() {
-  const now = new Date();
-  const [total, active, inspectionsDue, openDiscrepancies] = await Promise.all([
+  const [total, active, openDiscrepancies] = await Promise.all([
     prisma.vehicle.count(),
-    prisma.vehicle.count({ where: { status: "ACTIVE" } }),
-    prisma.vehicle.count({ where: { nextInspectionDate: { lte: now } } }),
+    prisma.vehicle.count({ where: { isActive: true } }),
     prisma.vehicleDiscrepancy.count({ where: { status: "OPEN" } }),
   ]);
-  return { total, active, inspectionsDue, openDiscrepancies };
+  return { total, active, openDiscrepancies };
 }
 
 export async function getVehicles(skip: number, take: number, search: string) {
@@ -19,17 +16,11 @@ export async function getVehicles(skip: number, take: number, search: string) {
           { registrationNo: { contains: search, mode: "insensitive" as const } },
           { make: { contains: search, mode: "insensitive" as const } },
           { model: { contains: search, mode: "insensitive" as const } },
-          { vehicleType: { contains: search, mode: "insensitive" as const } },
         ],
       }
     : {};
   const [data, total] = await Promise.all([
-    prisma.vehicle.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.vehicle.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
     prisma.vehicle.count({ where }),
   ]);
   return { data, total };
@@ -38,10 +29,7 @@ export async function getVehicles(skip: number, take: number, search: string) {
 export async function getVehicle(id: string) {
   return prisma.vehicle.findUnique({
     where: { id },
-    include: {
-      inspections: true,
-      discrepancies: true,
-    },
+    include: { inspections: true },
   });
 }
 
@@ -62,7 +50,6 @@ export async function getInspections(skip: number, take: number, search: string)
   const where = search
     ? {
         OR: [
-          { inspectionNo: { contains: search, mode: "insensitive" as const } },
           { vehicle: { registrationNo: { contains: search, mode: "insensitive" as const } } },
         ],
       }
@@ -73,7 +60,7 @@ export async function getInspections(skip: number, take: number, search: string)
       skip,
       take,
       include: { vehicle: true },
-      orderBy: { inspectionDate: "desc" },
+      orderBy: { scheduledAt: "desc" },
     }),
     prisma.vehicleInspection.count({ where }),
   ]);
@@ -88,20 +75,15 @@ export async function createInspection(data: Record<string, unknown>) {
 
 export async function getDiscrepancies(skip: number, take: number, search: string) {
   const where = search
-    ? {
-        OR: [
-          { description: { contains: search, mode: "insensitive" as const } },
-          { vehicle: { registrationNo: { contains: search, mode: "insensitive" as const } } },
-        ],
-      }
+    ? { description: { contains: search, mode: "insensitive" as const } }
     : {};
   const [data, total] = await Promise.all([
     prisma.vehicleDiscrepancy.findMany({
       where,
       skip,
       take,
-      include: { vehicle: true },
-      orderBy: { createdAt: "desc" },
+      include: { inspection: true },
+      orderBy: { vehicleId: "asc" },
     }),
     prisma.vehicleDiscrepancy.count({ where }),
   ]);
@@ -109,7 +91,7 @@ export async function getDiscrepancies(skip: number, take: number, search: strin
 }
 
 export async function getGPSLogs(vehicleId: string) {
-  return prisma.vehicleGPSLog.findMany({
+  return prisma.gPSLog.findMany({
     where: { vehicleId },
     orderBy: { timestamp: "desc" },
     take: 100,

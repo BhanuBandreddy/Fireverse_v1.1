@@ -17,7 +17,7 @@ export async function listVehicles(req: Request, res: Response, next: NextFuncti
 
 export async function getVehicle(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getVehicle(req.params["id"]!);
+    const item = await svc.getVehicle(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -28,7 +28,7 @@ export async function createVehicle(req: Request, res: Response, next: NextFunct
 }
 
 export async function updateVehicle(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateVehicle(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateVehicle(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function listInspections(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -52,5 +52,5 @@ export async function listDiscrepancies(req: Request, res: Response, next: NextF
 }
 
 export async function getGPSLogs(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.getGPSLogs(req.params["vehicleId"]!)); } catch (e) { next(e); }
+  try { success(res, await svc.getGPSLogs(req.params["vehicleId"] as string)); } catch (e) { next(e); }
 }

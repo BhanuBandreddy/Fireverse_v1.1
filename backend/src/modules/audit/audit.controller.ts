@@ -17,7 +17,7 @@ export async function listAudits(req: Request, res: Response, next: NextFunction
 
 export async function getAudit(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getAudit(req.params["id"]!);
+    const item = await svc.getAudit(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -28,7 +28,7 @@ export async function createAudit(req: Request, res: Response, next: NextFunctio
 }
 
 export async function updateAudit(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateAudit(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateAudit(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function listObservations(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -44,7 +44,7 @@ export async function createObservation(req: Request, res: Response, next: NextF
 }
 
 export async function closeObservation(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.closeObservation(req.params["id"]!), "Closed"); } catch (e) { next(e); }
+  try { success(res, await svc.closeObservation(req.params["id"] as string), "Closed"); } catch (e) { next(e); }
 }
 
 export async function listTypes(_req: Request, res: Response, next: NextFunction): Promise<void> {

@@ -17,7 +17,7 @@ export async function listEmployees(req: Request, res: Response, next: NextFunct
 
 export async function getEmployee(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getEmployee(req.params["id"]!);
+    const item = await svc.getEmployee(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -28,11 +28,11 @@ export async function createEmployee(req: Request, res: Response, next: NextFunc
 }
 
 export async function updateEmployee(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateEmployee(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateEmployee(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function deleteEmployee(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.deleteEmployee(req.params["id"]!), "Deleted"); } catch (e) { next(e); }
+  try { success(res, await svc.deleteEmployee(req.params["id"] as string), "Deleted"); } catch (e) { next(e); }
 }
 
 export async function listDepartments(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -48,11 +48,11 @@ export async function createDepartment(req: Request, res: Response, next: NextFu
 }
 
 export async function updateDepartment(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateDepartment(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateDepartment(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function deleteDepartment(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.deleteDepartment(req.params["id"]!), "Deleted"); } catch (e) { next(e); }
+  try { success(res, await svc.deleteDepartment(req.params["id"] as string), "Deleted"); } catch (e) { next(e); }
 }
 
 export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {

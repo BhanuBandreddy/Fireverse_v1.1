@@ -20,7 +20,7 @@ export async function createItem(req: Request, res: Response, next: NextFunction
 }
 
 export async function updateItem(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateItem(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateItem(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function listWarehouses(req: Request, res: Response, next: NextFunction): Promise<void> {

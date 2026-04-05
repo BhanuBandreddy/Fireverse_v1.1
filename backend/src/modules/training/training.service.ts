@@ -1,6 +1,5 @@
 import { prisma } from "../../lib/prisma";
 
-
 export async function getDashboardStats() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -9,9 +8,9 @@ export async function getDashboardStats() {
   const [scheduled, courses, attendees, thisMonth] = await Promise.all([
     prisma.trainingSchedule.count({ where: { status: "SCHEDULED" } }),
     prisma.course.count(),
-    prisma.trainingAttendee.count(),
+    prisma.trainingAttendance.count(),
     prisma.trainingSchedule.count({
-      where: { scheduledDate: { gte: startOfMonth, lte: endOfMonth } },
+      where: { startDate: { gte: startOfMonth, lte: endOfMonth } },
     }),
   ]);
   return { scheduled, courses, attendees, thisMonth };
@@ -22,7 +21,6 @@ export async function getSchedules(skip: number, take: number, search: string) {
     ? {
         OR: [
           { title: { contains: search, mode: "insensitive" as const } },
-          { venue: { contains: search, mode: "insensitive" as const } },
           { course: { name: { contains: search, mode: "insensitive" as const } } },
         ],
       }
@@ -32,8 +30,8 @@ export async function getSchedules(skip: number, take: number, search: string) {
       where,
       skip,
       take,
-      include: { course: true, attendees: true, trainer: true },
-      orderBy: { scheduledDate: "desc" },
+      include: { course: true, attendances: true },
+      orderBy: { startDate: "desc" },
     }),
     prisma.trainingSchedule.count({ where }),
   ]);
@@ -43,7 +41,7 @@ export async function getSchedules(skip: number, take: number, search: string) {
 export async function getSchedule(id: string) {
   return prisma.trainingSchedule.findUnique({
     where: { id },
-    include: { course: true, attendees: { include: { employee: true } }, trainer: true },
+    include: { course: true, attendances: { include: { employee: true } } },
   });
 }
 
@@ -70,12 +68,7 @@ export async function getCourses(skip: number, take: number, search: string) {
       }
     : {};
   const [data, total] = await Promise.all([
-    prisma.course.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.course.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
     prisma.course.count({ where }),
   ]);
   return { data, total };

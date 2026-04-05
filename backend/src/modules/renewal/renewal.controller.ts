@@ -29,7 +29,7 @@ export async function listApplications(req: Request, res: Response, next: NextFu
 
 export async function getApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getApplication(req.params["id"]!);
+    const item = await svc.getApplication(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -40,5 +40,5 @@ export async function createApplication(req: Request, res: Response, next: NextF
 }
 
 export async function updateApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateApplication(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateApplication(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }

@@ -17,7 +17,7 @@ export async function listIncidents(req: Request, res: Response, next: NextFunct
 
 export async function getIncident(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const item = await svc.getIncident(req.params["id"]!);
+    const item = await svc.getIncident(req.params["id"] as string);
     if (!item) { fail(res, "Not found", 404); return; }
     success(res, item);
   } catch (e) { next(e); }
@@ -28,11 +28,11 @@ export async function createIncident(req: Request, res: Response, next: NextFunc
 }
 
 export async function updateIncident(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.updateIncident(req.params["id"]!, req.body as Record<string, unknown>)); } catch (e) { next(e); }
+  try { success(res, await svc.updateIncident(req.params["id"] as string, req.body as Record<string, unknown>)); } catch (e) { next(e); }
 }
 
 export async function deleteIncident(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try { success(res, await svc.closeIncident(req.params["id"]!), "Closed"); } catch (e) { next(e); }
+  try { success(res, await svc.closeIncident(req.params["id"] as string), "Closed"); } catch (e) { next(e); }
 }
 
 export async function listTypes(_req: Request, res: Response, next: NextFunction): Promise<void> {
