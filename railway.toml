@@ -1,7 +1,7 @@
 # Backend service — Railway reads this from repo root
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && npm ci && npx prisma generate && npx tsc -p backend/tsconfig.json"
+buildCommand = "cd backend && npm ci && npm run build"
 
 [deploy]
 startCommand = "cd backend && node dist/index.js"

@@ -9,20 +9,97 @@ datasource db {
 
 // ─── ENUMS ────────────────────────────────────────────────────────────────────
 
-enum UserStatus      { ACTIVE INACTIVE SUSPENDED }
-enum Gender          { MALE FEMALE OTHER }
-enum Priority        { LOW MEDIUM HIGH CRITICAL }
-enum Severity        { LOW MEDIUM HIGH VERY_HIGH }
-enum ApprovalStatus  { PENDING APPROVED REJECTED UNDER_REVIEW }
-enum NOCType         { PROVISIONAL AMENDMENT FINAL TEMPORARY }
-enum CertType        { NOC B_FORM FITNESS }
-enum InspectionStatus { SCHEDULED IN_PROGRESS COMPLETED CANCELLED }
-enum IncidentStatus  { OPEN IN_PROGRESS CLOSED }
-enum TrainingStatus  { SCHEDULED ONGOING COMPLETED CANCELLED }
-enum DrillStatus     { REQUESTED PLANNED SCHEDULED COMPLETED CLOSED }
-enum AuditStatus     { PLANNED IN_PROGRESS COMPLETED }
-enum StockStatus     { OPEN APPROVED CLOSED }
-enum AssetStatus     { ACTIVE IN_REPAIR RETIRED }
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  UNDER_REVIEW
+}
+
+enum NOCType {
+  PROVISIONAL
+  AMENDMENT
+  FINAL
+  TEMPORARY
+}
+
+enum CertType {
+  NOC
+  B_FORM
+  FITNESS
+}
+
+enum InspectionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum IncidentStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum TrainingStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum DrillStatus {
+  REQUESTED
+  PLANNED
+  SCHEDULED
+  COMPLETED
+  CLOSED
+}
+
+enum AuditStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum StockStatus {
+  OPEN
+  APPROVED
+  CLOSED
+}
+
+enum AssetStatus {
+  ACTIVE
+  IN_REPAIR
+  RETIRED
+}
 
 // ─── ORGANISATION / LOCATION ─────────────────────────────────────────────────
 
