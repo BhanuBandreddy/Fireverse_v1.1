@@ -6,6 +6,6 @@ buildCommand = "cd backend && npm ci && npm run build"
 [deploy]
 startCommand = "cd backend && npx prisma db push --accept-data-loss && node dist/seed.js && node dist/index.js"
 healthcheckPath = "/api/health"
-healthcheckTimeout = 30
+healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

@@ -15,6 +15,13 @@ const ALL_RESOURCES = [
 ];
 
 async function main() {
+  // Skip seed entirely if already seeded — avoids 3000+ DB round-trips on every deploy
+  const alreadySeeded = await prisma.user.findFirst({ where: { username: "superadmin" } });
+  if (alreadySeeded) {
+    console.log("✅ Database already seeded — skipping (fast path)");
+    return;
+  }
+
   console.log("🌱 Seeding Firedrive database...");
 
   // Create all permissions
