@@ -1,0 +1,998 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ────────────────────────────────────────────────────────────────────
+
+enum UserStatus      { ACTIVE INACTIVE SUSPENDED }
+enum Gender          { MALE FEMALE OTHER }
+enum Priority        { LOW MEDIUM HIGH CRITICAL }
+enum Severity        { LOW MEDIUM HIGH VERY_HIGH }
+enum ApprovalStatus  { PENDING APPROVED REJECTED UNDER_REVIEW }
+enum NOCType         { PROVISIONAL AMENDMENT FINAL TEMPORARY }
+enum CertType        { NOC B_FORM FITNESS }
+enum InspectionStatus { SCHEDULED IN_PROGRESS COMPLETED CANCELLED }
+enum IncidentStatus  { OPEN IN_PROGRESS CLOSED }
+enum TrainingStatus  { SCHEDULED ONGOING COMPLETED CANCELLED }
+enum DrillStatus     { REQUESTED PLANNED SCHEDULED COMPLETED CLOSED }
+enum AuditStatus     { PLANNED IN_PROGRESS COMPLETED }
+enum StockStatus     { OPEN APPROVED CLOSED }
+enum AssetStatus     { ACTIVE IN_REPAIR RETIRED }
+
+// ─── ORGANISATION / LOCATION ─────────────────────────────────────────────────
+
+model Organization {
+  id          String         @id @default(cuid())
+  name        String
+  shortCode   String         @unique
+  type        String
+  parentId    String?
+  parent      Organization?  @relation("OrgHierarchy", fields: [parentId], references: [id])
+  children    Organization[] @relation("OrgHierarchy")
+  address     String?
+  city        String?
+  state       String?
+  pincode     String?
+  phone       String?
+  email       String?
+  latitude    Float?
+  longitude   Float?
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  users       User[]
+  employees   Employee[]
+  departments Department[]
+  @@map("organizations")
+}
+
+// ─── USER / AUTH ──────────────────────────────────────────────────────────────
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  displayName String
+  description String?
+  permissions RolePermission[]
+  users       UserRole[]
+  createdAt   DateTime         @default(now())
+  @@map("roles")
+}
+
+model Permission {
+  id       String           @id @default(cuid())
+  module   String
+  action   String
+  resource String
+  roles    RolePermission[]
+  @@unique([module, action, resource])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  username       String        @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  phone          String?
+  profilePicUrl  String?
+  status         UserStatus    @default(ACTIVE)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  roles          UserRole[]
+  refreshTokens  RefreshToken[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lastLoginAt    DateTime?
+  @@map("users")
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@map("refresh_tokens")
+}
+
+// ─── MODULE 1: FIRE ADMINISTRATIVE ───────────────────────────────────────────
+
+model Department {
+  id             String       @id @default(cuid())
+  name           String
+  code           String?
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employees      Employee[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  @@map("departments")
+}
+
+model Designation {
+  id        String     @id @default(cuid())
+  name      String
+  code      String?
+  level     Int        @default(0)
+  employees Employee[]
+  createdAt DateTime   @default(now())
+  @@map("designations")
+}
+
+model Employee {
+  id               String          @id @default(cuid())
+  employeeCode     String          @unique
+  firstName        String
+  lastName         String
+  email            String?
+  phone            String?
+  gender           Gender?
+  dob              DateTime?
+  joiningDate      DateTime?
+  departmentId     String?
+  department       Department?     @relation(fields: [departmentId], references: [id])
+  designationId    String?
+  designation      Designation?    @relation(fields: [designationId], references: [id])
+  organizationId   String
+  organization     Organization    @relation(fields: [organizationId], references: [id])
+  shiftId          String?
+  shift            Shift?          @relation(fields: [shiftId], references: [id])
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  attendances      Attendance[]
+  rosters          Roster[]
+  assetAllocations AssetAllocation[]
+  trainingAttendances TrainingAttendance[]
+  @@map("employees")
+}
+
+model Shift {
+  id        String     @id @default(cuid())
+  name      String
+  startTime String
+  endTime   String
+  isActive  Boolean    @default(true)
+  employees Employee[]
+  @@map("shifts")
+}
+
+model Attendance {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  date       DateTime
+  shiftType  String
+  status     String
+  checkIn    DateTime?
+  checkOut   DateTime?
+  remarks    String?
+  createdAt  DateTime  @default(now())
+  @@map("attendances")
+}
+
+model Roster {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  date       DateTime
+  dutyType   String
+  locationId String?
+  remarks    String?
+  createdAt  DateTime @default(now())
+  @@map("rosters")
+}
+
+model InwardOutwardRegister {
+  id             String   @id @default(cuid())
+  type           String
+  referenceNo    String
+  subject        String
+  fromTo         String
+  date           DateTime
+  category       String?
+  remarks        String?
+  organizationId String
+  createdAt      DateTime @default(now())
+  @@map("inward_outward_registers")
+}
+
+model DocumentCategory {
+  id       String             @id @default(cuid())
+  name     String
+  parentId String?
+  parent   DocumentCategory?  @relation("DocCatHierarchy", fields: [parentId], references: [id])
+  children DocumentCategory[] @relation("DocCatHierarchy")
+  documents Document[]
+  @@map("document_categories")
+}
+
+model Document {
+  id         String            @id @default(cuid())
+  name       String
+  fileUrl    String
+  fileType   String
+  fileSize   Int?
+  categoryId String?
+  category   DocumentCategory? @relation(fields: [categoryId], references: [id])
+  uploadedBy String
+  tags       String[]
+  createdAt  DateTime          @default(now())
+  @@map("documents")
+}
+
+// ─── MODULE 2: NOC MANAGEMENT ────────────────────────────────────────────────
+
+model BuildingUsageType {
+  id       String                 @id @default(cuid())
+  name     String
+  code     String?
+  subTypes BuildingSubUsageType[]
+  nocFees  NOCFee[]
+  @@map("building_usage_types")
+}
+
+model BuildingSubUsageType {
+  id          String            @id @default(cuid())
+  name        String
+  usageTypeId String
+  usageType   BuildingUsageType @relation(fields: [usageTypeId], references: [id])
+  @@map("building_sub_usage_types")
+}
+
+model NOCApplication {
+  id                  String         @id @default(cuid())
+  applicationNo       String         @unique
+  nocType             NOCType
+  applicantName       String
+  applicantEmail      String
+  applicantPhone      String
+  projectName         String
+  buildingAddress     String
+  city                String
+  ward                String?
+  latitude            Float?
+  longitude           Float?
+  buildingUsageTypeId String?
+  squareMeterage      Float?
+  architectName       String?
+  architectEmail      String?
+  version             Int            @default(1)
+  status              ApprovalStatus @default(PENDING)
+  remarks             String?
+  documents           NOCDocument[]
+  payments            NOCPayment[]
+  inspections         NOCInspection[]
+  certificates        NOCCertificate[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  @@map("noc_applications")
+}
+
+model NOCDocument {
+  id            String         @id @default(cuid())
+  applicationId String
+  application   NOCApplication @relation(fields: [applicationId], references: [id])
+  docType       String
+  fileUrl       String
+  fileSize      Int?
+  verified      Boolean        @default(false)
+  verifiedBy    String?
+  verifiedAt    DateTime?
+  remarks       String?
+  createdAt     DateTime       @default(now())
+  @@map("noc_documents")
+}
+
+model NOCFee {
+  id                  String             @id @default(cuid())
+  buildingUsageTypeId String?
+  buildingUsageType   BuildingUsageType? @relation(fields: [buildingUsageTypeId], references: [id])
+  nocType             NOCType
+  baseAmount          Float
+  perSqmAmount        Float?
+  effectiveFrom       DateTime
+  effectiveTo         DateTime?
+  isActive            Boolean            @default(true)
+  @@map("noc_fees")
+}
+
+model NOCPayment {
+  id            String         @id @default(cuid())
+  applicationId String
+  application   NOCApplication @relation(fields: [applicationId], references: [id])
+  demandNoteNo  String?
+  amount        Float
+  penalty       Float          @default(0)
+  totalAmount   Float
+  receiptNo     String?
+  receiptUrl    String?
+  paidAt        DateTime?
+  status        String         @default("PENDING")
+  createdAt     DateTime       @default(now())
+  @@map("noc_payments")
+}
+
+model NOCInspection {
+  id                   String           @id @default(cuid())
+  applicationId        String
+  application          NOCApplication   @relation(fields: [applicationId], references: [id])
+  surveyorId           String
+  scheduledAt          DateTime
+  conductedAt          DateTime?
+  status               InspectionStatus @default(SCHEDULED)
+  complianceReport     String?
+  deficiencies         String?
+  reinspectionRequired Boolean          @default(false)
+  createdAt            DateTime         @default(now())
+  @@map("noc_inspections")
+}
+
+model NOCCertificate {
+  id            String         @id @default(cuid())
+  applicationId String
+  application   NOCApplication @relation(fields: [applicationId], references: [id])
+  certNo        String         @unique
+  nocType       NOCType
+  issuedAt      DateTime?
+  expiresAt     DateTime?
+  fileUrl       String?
+  approvedBy    String?
+  isActive      Boolean        @default(true)
+  @@map("noc_certificates")
+}
+
+// ─── MODULE 3: FIRE INSPECTION ────────────────────────────────────────────────
+
+model BuildingCategory {
+  id             String              @id @default(cuid())
+  name           String
+  code           String?
+  parentId       String?
+  parent         BuildingCategory?   @relation("BldgCatHierarchy", fields: [parentId], references: [id])
+  children       BuildingCategory[]  @relation("BldgCatHierarchy")
+  objectTypes    ObjectType[]
+  checklists     InspectionChecklist[]
+  deviationTypes DeviationType[]
+  @@map("building_categories")
+}
+
+model ObjectType {
+  id         String           @id @default(cuid())
+  name       String
+  categoryId String
+  category   BuildingCategory @relation(fields: [categoryId], references: [id])
+  instances  ObjectInstance[]
+  @@map("object_types")
+}
+
+model ObjectInstance {
+  id           String     @id @default(cuid())
+  objectTypeId String
+  objectType   ObjectType @relation(fields: [objectTypeId], references: [id])
+  locationId   String?
+  qrCode       String     @unique @default(cuid())
+  serialNo     String?
+  installDate  DateTime?
+  isActive     Boolean    @default(true)
+  @@map("object_instances")
+}
+
+model InspectionChecklist {
+  id         String            @id @default(cuid())
+  name       String
+  categoryId String?
+  category   BuildingCategory? @relation(fields: [categoryId], references: [id])
+  tasks      ChecklistTask[]
+  @@map("inspection_checklists")
+}
+
+model ChecklistTask {
+  id            String              @id @default(cuid())
+  checklistId   String
+  checklist     InspectionChecklist @relation(fields: [checklistId], references: [id])
+  name          String
+  description   String?
+  attributeType String
+  options       String[]
+  sequence      Int                 @default(0)
+  isMandatory   Boolean             @default(true)
+  @@map("checklist_tasks")
+}
+
+model DeviationType {
+  id                  String            @id @default(cuid())
+  name                String
+  categoryId          String?
+  category            BuildingCategory? @relation(fields: [categoryId], references: [id])
+  resolutionProcedure String?
+  deviations          Deviation[]
+  @@map("deviation_types")
+}
+
+model ScheduledInspection {
+  id          String           @id @default(cuid())
+  title       String
+  locationId  String
+  categoryId  String?
+  inspectorId String
+  scheduledAt DateTime
+  status      InspectionStatus @default(SCHEDULED)
+  qrCode      String?
+  results     InspectionResult[]
+  createdAt   DateTime         @default(now())
+  @@map("scheduled_inspections")
+}
+
+model InspectionResult {
+  id           String              @id @default(cuid())
+  inspectionId String
+  inspection   ScheduledInspection @relation(fields: [inspectionId], references: [id])
+  taskId       String
+  value        String?
+  imageUrls    String[]
+  remarks      String?
+  recordedAt   DateTime            @default(now())
+  recordedBy   String
+  @@map("inspection_results")
+}
+
+model Deviation {
+  id              String         @id @default(cuid())
+  inspectionId    String?
+  deviationTypeId String?
+  deviationType   DeviationType? @relation(fields: [deviationTypeId], references: [id])
+  locationId      String?
+  description     String
+  imageUrls       String[]
+  status          String         @default("OPEN")
+  resolvedBy      String?
+  resolvedAt      DateTime?
+  resolutionNotes String?
+  createdAt       DateTime       @default(now())
+  @@map("deviations")
+}
+
+// ─── MODULE 4: RENEWAL MANAGEMENT ────────────────────────────────────────────
+
+model Firm {
+  id                  String               @id @default(cuid())
+  firmName            String
+  firmCode            String?              @unique
+  address             String?
+  ward                String?
+  locationId          String?
+  contactName         String?
+  contactPhone        String?
+  contactEmail        String?
+  businessType        String?
+  isResidential       Boolean              @default(false)
+  propertyTaxId       String?
+  renewalApplications RenewalApplication[]
+  createdAt           DateTime             @default(now())
+  @@map("firms")
+}
+
+model RenewalApplication {
+  id          String            @id @default(cuid())
+  refNo       String            @unique
+  firmId      String
+  firm        Firm              @relation(fields: [firmId], references: [id])
+  certType    CertType
+  expiryDate  DateTime?
+  submittedAt DateTime          @default(now())
+  status      ApprovalStatus    @default(PENDING)
+  documents   RenewalDocument[]
+  payments    RenewalPayment[]
+  inspections RenewalInspection[]
+  createdAt   DateTime          @default(now())
+  @@map("renewal_applications")
+}
+
+model RenewalDocument {
+  id            String             @id @default(cuid())
+  applicationId String
+  application   RenewalApplication @relation(fields: [applicationId], references: [id])
+  docType       String
+  fileUrl       String
+  effectiveDate DateTime?
+  createdAt     DateTime           @default(now())
+  @@map("renewal_documents")
+}
+
+model RenewalPayment {
+  id            String             @id @default(cuid())
+  applicationId String
+  application   RenewalApplication @relation(fields: [applicationId], references: [id])
+  amount        Float
+  penalty       Float              @default(0)
+  demandNoteNo  String?
+  receiptUrl    String?
+  paidAt        DateTime?
+  status        String             @default("PENDING")
+  @@map("renewal_payments")
+}
+
+model RenewalInspection {
+  id            String             @id @default(cuid())
+  applicationId String
+  application   RenewalApplication @relation(fields: [applicationId], references: [id])
+  inspectorId   String
+  scheduledAt   DateTime
+  status        InspectionStatus   @default(SCHEDULED)
+  outcome       String?
+  @@map("renewal_inspections")
+}
+
+// ─── MODULE 5: EQUIPMENT / INVENTORY ─────────────────────────────────────────
+
+model Warehouse {
+  id        String          @id @default(cuid())
+  name      String
+  locationId String?
+  address   String?
+  isActive  Boolean         @default(true)
+  inventory InventoryItem[]
+  @@map("warehouses")
+}
+
+model ItemCategory {
+  id    String      @id @default(cuid())
+  name  String
+  code  String?
+  group String?
+  items StoreItem[]
+  @@map("item_categories")
+}
+
+model StoreItem {
+  id           String        @id @default(cuid())
+  name         String
+  code         String        @unique
+  categoryId   String?
+  category     ItemCategory? @relation(fields: [categoryId], references: [id])
+  uom          String
+  reorderLevel Int?
+  isActive     Boolean       @default(true)
+  inventory    InventoryItem[]
+  mrLines      MRLine[]
+  grnLines     GRNLine[]
+  @@map("store_items")
+}
+
+model InventoryItem {
+  id          String    @id @default(cuid())
+  itemId      String
+  item        StoreItem @relation(fields: [itemId], references: [id])
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  quantity    Float     @default(0)
+  updatedAt   DateTime  @updatedAt
+  @@unique([itemId, warehouseId])
+  @@map("inventory_items")
+}
+
+model MaterialRequisition {
+  id          String      @id @default(cuid())
+  mrNo        String      @unique
+  requestedBy String
+  locationId  String?
+  status      StockStatus @default(OPEN)
+  lines       MRLine[]
+  createdAt   DateTime    @default(now())
+  @@map("material_requisitions")
+}
+
+model MRLine {
+  id       String              @id @default(cuid())
+  mrId     String
+  mr       MaterialRequisition @relation(fields: [mrId], references: [id])
+  itemId   String
+  item     StoreItem           @relation(fields: [itemId], references: [id])
+  quantity Float
+  remarks  String?
+  @@map("mr_lines")
+}
+
+model GoodsReceivedNote {
+  id              String    @id @default(cuid())
+  grnNo           String    @unique
+  poNo            String?
+  supplierName    String?
+  supplierAddress String?
+  challanNo       String?
+  invoiceNo       String?
+  receivedAt      DateTime  @default(now())
+  lines           GRNLine[]
+  @@map("goods_received_notes")
+}
+
+model GRNLine {
+  id          String            @id @default(cuid())
+  grnId       String
+  grn         GoodsReceivedNote @relation(fields: [grnId], references: [id])
+  itemId      String
+  item        StoreItem         @relation(fields: [itemId], references: [id])
+  quantity    Float
+  warehouseId String?
+  @@map("grn_lines")
+}
+
+model Asset {
+  id          String            @id @default(cuid())
+  assetName   String
+  itemId      String
+  grnRefNo    String?
+  serialNo    String?
+  model       String?
+  make        String?
+  qrCode      String            @unique @default(cuid())
+  status      AssetStatus       @default(ACTIVE)
+  allocations AssetAllocation[]
+  createdAt   DateTime          @default(now())
+  @@map("assets")
+}
+
+model AssetAllocation {
+  id         String    @id @default(cuid())
+  assetId    String
+  asset      Asset     @relation(fields: [assetId], references: [id])
+  employeeId String?
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  locationId String?
+  fromDate   DateTime
+  untilDate  DateTime?
+  remarks    String?
+  @@map("asset_allocations")
+}
+
+// ─── MODULE 6: VEHICLE / GPS ──────────────────────────────────────────────────
+
+model Vehicle {
+  id             String              @id @default(cuid())
+  registrationNo String              @unique
+  make           String?
+  model          String?
+  chassisNo      String?
+  bodyType       String?
+  stationId      String?
+  gpsDeviceId    String?
+  isActive       Boolean             @default(true)
+  accessories    VehicleAccessory[]
+  gpsLogs        GPSLog[]
+  inspections    VehicleInspection[]
+  createdAt      DateTime            @default(now())
+  @@map("vehicles")
+}
+
+model VehicleAccessory {
+  id        String  @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  name      String
+  quantity  Int     @default(1)
+  @@map("vehicle_accessories")
+}
+
+model GPSLog {
+  id        String   @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  latitude  Float
+  longitude Float
+  speed     Float?
+  heading   Float?
+  timestamp DateTime @default(now())
+  @@map("gps_logs")
+}
+
+model VehicleInspection {
+  id            String                    @id @default(cuid())
+  vehicleId     String
+  vehicle       Vehicle                   @relation(fields: [vehicleId], references: [id])
+  inspectorId   String
+  scheduledAt   DateTime
+  conductedAt   DateTime?
+  status        InspectionStatus          @default(SCHEDULED)
+  results       VehicleInspectionResult[]
+  discrepancies VehicleDiscrepancy[]
+  createdAt     DateTime                  @default(now())
+  @@map("vehicle_inspections")
+}
+
+model VehicleInspectionResult {
+  id           String            @id @default(cuid())
+  inspectionId String
+  inspection   VehicleInspection @relation(fields: [inspectionId], references: [id])
+  taskName     String
+  value        String?
+  imageUrls    String[]
+  remarks      String?
+  @@map("vehicle_inspection_results")
+}
+
+model VehicleDiscrepancy {
+  id                 String             @id @default(cuid())
+  inspectionId       String?
+  inspection         VehicleInspection? @relation(fields: [inspectionId], references: [id])
+  vehicleId          String
+  description        String
+  riskLevel          String
+  category           String?
+  status             String             @default("OPEN")
+  resolvedBy         String?
+  resolvedAt         DateTime?
+  resolutionDuration Int?
+  @@map("vehicle_discrepancies")
+}
+
+// ─── MODULE 7: INCIDENT MANAGEMENT ───────────────────────────────────────────
+
+model IncidentType {
+  id        String     @id @default(cuid())
+  name      String
+  code      String?
+  incidents Incident[]
+  @@map("incident_types")
+}
+
+model IncidentCategory {
+  id        String     @id @default(cuid())
+  name      String
+  incidents Incident[]
+  @@map("incident_categories")
+}
+
+model Incident {
+  id           String            @id @default(cuid())
+  incidentNo   String            @unique
+  title        String
+  typeId       String?
+  type         IncidentType?     @relation(fields: [typeId], references: [id])
+  categoryId   String?
+  category     IncidentCategory? @relation(fields: [categoryId], references: [id])
+  locationId   String?
+  address      String?
+  latitude     Float?
+  longitude    Float?
+  status       IncidentStatus    @default(OPEN)
+  priority     Priority          @default(MEDIUM)
+  severity     Severity          @default(MEDIUM)
+  reportedAt   DateTime          @default(now())
+  reportedBy   String
+  description  String?
+  impact       String?
+  cause        String?
+  actionsTaken String?
+  closedAt     DateTime?
+  closedBy     String?
+  imageUrls    String[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  @@map("incidents")
+}
+
+// ─── MODULE 8: TRAINING ───────────────────────────────────────────────────────
+
+model CourseType {
+  id   String @id @default(cuid())
+  name String
+  @@map("course_types")
+}
+
+model Course {
+  id              String                     @id @default(cuid())
+  name            String
+  code            String?                    @unique
+  courseTypeId    String?
+  duration        Int?
+  description     String?
+  attachments     String[]
+  schedules       TrainingSchedule[]
+  designationMappings CourseDesignationMapping[]
+  createdAt       DateTime                   @default(now())
+  @@map("courses")
+}
+
+model CourseDesignationMapping {
+  id            String @id @default(cuid())
+  courseId      String
+  course        Course @relation(fields: [courseId], references: [id])
+  designationId String
+  @@map("course_designation_mappings")
+}
+
+model TrainingSchedule {
+  id              String               @id @default(cuid())
+  courseId        String
+  course          Course               @relation(fields: [courseId], references: [id])
+  title           String
+  startDate       DateTime
+  endDate         DateTime
+  locationId      String?
+  trainerName     String?
+  maxParticipants Int?
+  status          TrainingStatus       @default(SCHEDULED)
+  attendances     TrainingAttendance[]
+  createdAt       DateTime             @default(now())
+  @@map("training_schedules")
+}
+
+model TrainingAttendance {
+  id         String           @id @default(cuid())
+  scheduleId String
+  schedule   TrainingSchedule @relation(fields: [scheduleId], references: [id])
+  employeeId String
+  employee   Employee         @relation(fields: [employeeId], references: [id])
+  status     String
+  score      Float?
+  remarks    String?
+  locationId String?
+  recordedAt DateTime         @default(now())
+  @@map("training_attendances")
+}
+
+model Certification {
+  id             String @id @default(cuid())
+  name           String
+  code           String?
+  validityMonths Int?
+  @@map("certifications")
+}
+
+// ─── MODULE 9: MOCK DRILL ─────────────────────────────────────────────────────
+
+model DrillType {
+  id     String  @id @default(cuid())
+  name   String
+  drills Drill[]
+  @@map("drill_types")
+}
+
+model Drill {
+  id             String              @id @default(cuid())
+  title          String
+  drillTypeId    String?
+  drillType      DrillType?          @relation(fields: [drillTypeId], references: [id])
+  locationId     String?
+  ward           String?
+  scheduledAt    DateTime?
+  owner          String?
+  status         DrillStatus         @default(REQUESTED)
+  stakeholders   DrillStakeholder[]
+  checklistItems DrillChecklistItem[]
+  deviations     DrillDeviation[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  @@map("drills")
+}
+
+model DrillStakeholder {
+  id      String @id @default(cuid())
+  drillId String
+  drill   Drill  @relation(fields: [drillId], references: [id])
+  userId  String
+  role    String
+  @@map("drill_stakeholders")
+}
+
+model DrillChecklistItem {
+  id            String  @id @default(cuid())
+  drillId       String
+  drill         Drill   @relation(fields: [drillId], references: [id])
+  task          String
+  expectedValue String?
+  actualValue   String?
+  status        String  @default("PENDING")
+  @@map("drill_checklist_items")
+}
+
+model DrillDeviation {
+  id            String    @id @default(cuid())
+  drillId       String
+  drill         Drill     @relation(fields: [drillId], references: [id])
+  description   String
+  actionTakenBy String?
+  actionTakenAt DateTime?
+  remarks       String?
+  closedAt      DateTime?
+  closedBy      String?
+  @@map("drill_deviations")
+}
+
+// ─── MODULE 10: AUDIT MANAGEMENT ─────────────────────────────────────────────
+
+model AuditInspectionType {
+  id                String                  @id @default(cuid())
+  name              String
+  code              String?
+  checklistTemplate AuditChecklistTemplate?
+  audits            Audit[]
+  @@map("audit_inspection_types")
+}
+
+model AuditChecklistTemplate {
+  id     String                      @id @default(cuid())
+  typeId String                      @unique
+  type   AuditInspectionType         @relation(fields: [typeId], references: [id])
+  tasks  AuditChecklistTemplateTask[]
+  @@map("audit_checklist_templates")
+}
+
+model AuditChecklistTemplateTask {
+  id           String                 @id @default(cuid())
+  templateId   String
+  template     AuditChecklistTemplate @relation(fields: [templateId], references: [id])
+  name         String
+  departmentId String?
+  sequence     Int                    @default(0)
+  @@map("audit_checklist_template_tasks")
+}
+
+model Audit {
+  id           String               @id @default(cuid())
+  auditNo      String               @unique
+  typeId       String
+  type         AuditInspectionType  @relation(fields: [typeId], references: [id])
+  locationId   String?
+  scheduledAt  DateTime
+  conductedAt  DateTime?
+  auditorTeam  String[]
+  status       AuditStatus          @default(PLANNED)
+  observations AuditObservation[]
+  createdAt    DateTime             @default(now())
+  @@map("audits")
+}
+
+model AuditObservation {
+  id             String   @id @default(cuid())
+  auditId        String
+  audit          Audit    @relation(fields: [auditId], references: [id])
+  taskName       String
+  observation    String
+  riskLevel      String
+  imageUrls      String[]
+  isCritical     Boolean  @default(false)
+  status         String   @default("OPEN")
+  closedBy       String?
+  closedAt       DateTime?
+  closureRemarks String?
+  createdAt      DateTime @default(now())
+  @@map("audit_observations")
+}
+
+model AuditHistory {
+  id         String   @id @default(cuid())
+  locationId String
+  auditId    String
+  auditedAt  DateTime
+  summary    String?
+  @@map("audit_histories")
+}
