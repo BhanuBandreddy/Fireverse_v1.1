@@ -13,7 +13,7 @@ import {
   Tile,
   Heading,
 } from "@carbon/react";
-import { Login } from "@carbon/icons-react";
+import { Login, Fire } from "@carbon/icons-react";
 import client from "@/api/client";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -71,7 +71,20 @@ export default function LoginPage() {
     <div style={{ width: "100%", maxWidth: "440px", padding: "0 1rem" }}>
       <Tile style={{ padding: "3rem 2.5rem" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🔥</div>
+          <div
+            style={{
+              width: "72px",
+              height: "72px",
+              borderRadius: "50%",
+              background: "var(--cds-support-error)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 0.75rem",
+            }}
+          >
+            <Fire size={36} style={{ color: "#fff" }} />
+          </div>
           <Heading style={{ fontSize: "1.75rem", fontWeight: 700 }}>Firedrive</Heading>
           <p style={{ color: "var(--cds-text-secondary)", marginTop: "0.5rem", fontSize: "0.875rem" }}>
             Fire / Public Safety Management System

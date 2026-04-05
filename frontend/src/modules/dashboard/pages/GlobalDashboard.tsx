@@ -16,8 +16,6 @@ import {
   Security,
   Fire,
 } from "@carbon/icons-react";
-import { useAuthStore } from "@/store/auth.store";
-
 const moduleHealth = [
   { label: "Fire Admin", icon: Building, count: 124, status: "Operational", color: "--cds-support-success", path: "/fire-admin" },
   { label: "NOC Management", icon: DocumentSigned, count: 38, status: "5 Pending", color: "--cds-support-warning", path: "/noc" },
@@ -62,14 +60,12 @@ const alerts: { type: TagType; title: string; text: string }[] = [
 ];
 
 export default function GlobalDashboard() {
-  const user = useAuthStore((s) => s.user);
-
   return (
     <Grid fullWidth>
       <Column lg={16} md={8} sm={4}>
         <PageHeader
-          title={`Welcome, ${user?.firstName ?? "Admin"}`}
-          subtitle="Super Admin · Maharashtra Fire & Emergency Services (NMMC)"
+          title="Welcome, Super Admin"
+          subtitle="Super Admin · Maharashtra Fire &amp; Emergency Services (NMMC)"
         />
       </Column>
 
