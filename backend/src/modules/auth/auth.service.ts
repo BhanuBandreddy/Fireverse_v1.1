@@ -1,12 +1,10 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../lib/prisma";
 import {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
 } from "../../utils/jwt";
-
-const prisma = new PrismaClient();
 
 export async function login(email: string, password: string) {
   const user = await prisma.user.findUnique({
