@@ -4,6 +4,6 @@ builder = "nixpacks"
 buildCommand = "npm ci && npm run build"
 
 [deploy]
-startCommand = "npx serve -s dist -l $PORT"
+startCommand = "node node_modules/serve/build/main.js -s dist -l $PORT"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
