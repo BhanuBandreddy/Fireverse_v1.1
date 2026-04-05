@@ -4,6 +4,6 @@ builder = "nixpacks"
 buildCommand = "npm ci && npm run build"
 
 [deploy]
-startCommand = "node node_modules/serve/build/main.js -s dist -l $PORT"
+startCommand = "npm run serve"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
