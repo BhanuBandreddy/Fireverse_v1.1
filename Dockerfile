@@ -22,4 +22,4 @@ COPY --from=backend-builder /backend/prisma.config.ts ./prisma.config.ts
 COPY --from=frontend-builder /frontend/dist ./dist/public
 
 EXPOSE 8080
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/seed.js && node dist/index.js"]
