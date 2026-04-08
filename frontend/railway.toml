@@ -1,8 +1,11 @@
-# Frontend service — set Root Directory to "frontend" in Railway dashboard
+# Frontend service — Root Directory must be set to "frontend" in Railway dashboard
 [build]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+builder = "nixpacks"
+buildCommand = "npm ci && npm run build"
 
 [deploy]
+startCommand = "node server.mjs"
+healthcheckPath = "/"
+healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
