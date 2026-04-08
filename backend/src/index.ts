@@ -32,6 +32,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
+// Serve frontend build (production)
+const frontendDist = path.join(__dirname, "../../frontend/dist");
+app.use(express.static(frontendDist));
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/fire-admin", fireAdminRoutes);
@@ -51,6 +55,11 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use(errorHandler);
+
+// SPA fallback — must be after all API routes
+app.use((_req, res) => {
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+});
 
 app.listen(env.port, () => {
   logger.info(`🔥 Firedrive backend running on port ${env.port}`);

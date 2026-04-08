@@ -1,7 +1,7 @@
 # Backend service — Railway reads this from repo root
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && npm ci && npm run build"
+buildCommand = "cd frontend && npm ci && VITE_API_BASE_URL=/api npm run build && cd ../backend && npm ci && npm run build"
 
 [deploy]
 startCommand = "cd backend && npx prisma db push --accept-data-loss && node dist/seed.js && node dist/index.js"
