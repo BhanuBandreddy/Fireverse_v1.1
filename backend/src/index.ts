@@ -24,22 +24,9 @@ const app = express();
 
 app.use(helmet());
 
-// Allow: configured FRONTEND_URL, any Railway preview/production subdomain, localhost dev
-const ALLOWED_ORIGINS = [
-  env.frontendUrl,
-  /^https:\/\/[\w-]+\.up\.railway\.app$/,
-  /^http:\/\/localhost:\d+$/,
-];
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // server-to-server / curl
-    const allowed = ALLOWED_ORIGINS.some((o) =>
-      typeof o === "string" ? o === origin : o.test(origin)
-    );
-    cb(null, allowed);
-  },
-  credentials: true,
-}));
+// origin:true mirrors the request Origin back — allows any origin while
+// still supporting credentials (unlike '*' which breaks credentials)
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
