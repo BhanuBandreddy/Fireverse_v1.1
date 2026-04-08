@@ -22,5 +22,6 @@ COPY --from=backend-builder /backend/prisma.config.ts ./prisma.config.ts
 COPY --from=frontend-builder /frontend/dist ./dist/public
 
 # Railway sets PORT; app listens via env.port (see backend/src/config/env.ts)
+# Sync schema at boot (preDeploy on Railway often lacks DATABASE_URL or cwd for Prisma)
 EXPOSE 8080
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push && node dist/index.js"]

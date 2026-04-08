@@ -3,8 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Runs before the new container starts (requires DATABASE_URL from the Postgres plugin)
-preDeployCommand = "/bin/sh -c \"npx prisma db push\""
+# DB schema sync runs in Dockerfile CMD so DATABASE_URL + /app layout match runtime
 healthcheckPath = "/api/health"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
