@@ -1,10 +1,8 @@
-# Backend service — Railway reads this from repo root
 [build]
-builder = "nixpacks"
-buildCommand = "npm ci --prefix frontend && VITE_API_BASE_URL=/api npm run build --prefix frontend && npm ci --prefix backend && npm run build --prefix backend && mkdir -p backend/dist/public && cp -r frontend/dist/. backend/dist/public/"
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "cd backend && npx prisma db push --accept-data-loss && node dist/seed.js && node dist/index.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 120
 restartPolicyType = "on_failure"
