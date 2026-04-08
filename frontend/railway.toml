@@ -3,9 +3,12 @@
 builder = "nixpacks"
 buildCommand = "npm ci && npm run build"
 
+[build.nixpacksPlan.variables]
+VITE_API_BASE_URL = "https://firedrive-production.up.railway.app/api"
+
 [deploy]
 startCommand = "node server.mjs"
-healthcheckPath = "/"
+healthcheckPath = "/health"
 healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
