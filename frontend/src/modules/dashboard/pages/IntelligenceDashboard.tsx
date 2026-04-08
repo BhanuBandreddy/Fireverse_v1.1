@@ -257,55 +257,89 @@ export default function IntelligenceDashboard() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", maxWidth: "1400px", margin: "0 auto", padding: "0 0.25rem" }}>
 
       {/* ── Page header ── */}
-      <div style={{ borderBottom: "1px solid var(--cds-border-subtle-01)", paddingBottom: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-          <div
-            style={{
-              width: "36px", height: "36px", borderRadius: "8px",
-              background: "var(--cds-interactive)", display: "flex",
-              alignItems: "center", justifyContent: "center",
-            }}
-          >
-            <Bot size={20} style={{ fill: "#ffffff" }} />
-          </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "var(--cds-text-primary)" }}>
-              Intelligence Dashboard
-            </h1>
-            <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--cds-text-secondary)" }}>
-              AI-powered operational command view · Maharashtra Fire &amp; Emergency Services
-            </p>
-          </div>
+      <div
+        style={{
+          background: "linear-gradient(135deg, var(--cds-layer-01) 0%, var(--cds-layer-02) 100%)",
+          border: "1px solid var(--cds-border-subtle-01)",
+          borderRadius: "8px",
+          padding: "1.25rem 1.5rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+        }}
+      >
+        <div
+          style={{
+            width: "44px",
+            height: "44px",
+            borderRadius: "10px",
+            background: "linear-gradient(135deg, #0f62fe 0%, #4589ff 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            boxShadow: "0 2px 8px rgba(15, 98, 254, 0.35)",
+          }}
+        >
+          <Bot size={22} style={{ fill: "#ffffff" }} />
+        </div>
+        <div>
+          <h1 style={{ margin: 0, fontSize: "1.3125rem", fontWeight: 700, color: "var(--cds-text-primary)", letterSpacing: "-0.01em" }}>
+            Intelligence Dashboard
+          </h1>
+          <p style={{ margin: "0.125rem 0 0", fontSize: "0.8125rem", color: "var(--cds-text-secondary)" }}>
+            AI-powered operational command view &nbsp;&middot;&nbsp; Maharashtra Fire &amp; Emergency Services
+          </p>
         </div>
       </div>
 
       {/* ── KPI strip ── */}
       {summaryLoading ? (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "1rem 0" }}>
           <InlineLoading description="Loading executive summary…" />
         </div>
       ) : (
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "0.75rem" }}>
+          {/* KPI cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "0.875rem" }}>
             {kpis.map((kpi, i) => (
               <div
                 key={i}
                 style={{
                   background: "var(--cds-layer-01)",
-                  border: `1px solid var(--cds-border-subtle-01)`,
+                  border: "1px solid var(--cds-border-subtle-01)",
                   borderTop: `3px solid ${STATUS_COLOR[kpi.status]}`,
-                  borderRadius: "4px",
-                  padding: "0.875rem 1rem",
+                  borderRadius: "6px",
+                  padding: "1rem 1.125rem",
+                  minHeight: "88px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                  transition: "box-shadow 0.15s ease",
                 }}
               >
-                <p style={{ margin: 0, fontSize: "0.6875rem", color: "var(--cds-text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 600 }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.6875rem",
+                    color: "var(--cds-text-secondary)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                  }}
+                >
                   {kpi.label}
                 </p>
-                <p style={{ margin: "0.25rem 0 0", fontSize: "1.75rem", fontWeight: 700, color: STATUS_COLOR[kpi.status], lineHeight: 1 }}>
-                  {kpi.value}{kpi.unit ? <span style={{ fontSize: "0.875rem", fontWeight: 400, marginLeft: "2px" }}>{kpi.unit}</span> : null}
+                <p style={{ margin: "0.5rem 0 0", fontSize: "2.25rem", fontWeight: 700, color: STATUS_COLOR[kpi.status], lineHeight: 1 }}>
+                  {kpi.value}
+                  {kpi.unit ? (
+                    <span style={{ fontSize: "0.9375rem", fontWeight: 500, marginLeft: "3px", opacity: 0.8 }}>{kpi.unit}</span>
+                  ) : null}
                 </p>
               </div>
             ))}
@@ -318,18 +352,25 @@ export default function IntelligenceDashboard() {
                 <div
                   key={i}
                   style={{
-                    display: "flex", alignItems: "center", gap: "0.375rem",
-                    padding: "0.375rem 0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.375rem",
+                    padding: "0.375rem 0.875rem 0.375rem 0.75rem",
                     borderRadius: "4px",
-                    background: `color-mix(in srgb, ${SEV_COLOR[a.severity]} 12%, transparent)`,
-                    border: `1px solid ${SEV_COLOR[a.severity]}`,
+                    background: "var(--cds-layer-01)",
+                    borderLeft: `3px solid ${SEV_COLOR[a.severity]}`,
+                    border: `1px solid var(--cds-border-subtle-01)`,
+                    borderLeftWidth: "3px",
+                    borderLeftColor: SEV_COLOR[a.severity],
                     fontSize: "0.75rem",
                     color: "var(--cds-text-primary)",
+                    maxWidth: "360px",
+                    overflow: "hidden",
                   }}
                 >
-                  <span style={{ fontWeight: 700, color: SEV_COLOR[a.severity] }}>{a.module}</span>
-                  <ChevronRight size={12} style={{ fill: SEV_COLOR[a.severity] }} />
-                  {a.message}
+                  <span style={{ fontWeight: 700, color: SEV_COLOR[a.severity], flexShrink: 0 }}>{a.module}</span>
+                  <ChevronRight size={11} style={{ fill: SEV_COLOR[a.severity], flexShrink: 0 }} />
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.message}</span>
                 </div>
               ))}
             </div>
@@ -338,85 +379,139 @@ export default function IntelligenceDashboard() {
       )}
 
       {/* ── Chat + suggestions layout ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: "1rem", minHeight: "520px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 288px", gap: "1rem" }}>
 
         {/* Chat panel */}
         <div
           style={{
-            display: "flex", flexDirection: "column",
+            display: "flex",
+            flexDirection: "column",
             background: "var(--cds-layer-01)",
             border: "1px solid var(--cds-border-subtle-01)",
-            borderRadius: "4px",
+            borderRadius: "6px",
             overflow: "hidden",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
           {/* Chat header */}
           <div
             style={{
-              padding: "0.75rem 1rem",
+              padding: "0.875rem 1.125rem",
               background: "var(--cds-background-inverse)",
-              display: "flex", alignItems: "center", gap: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.625rem",
             }}
           >
             <Bot size={16} style={{ fill: "var(--cds-icon-inverse)" }} />
-            <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--cds-text-inverse)" }}>
+            <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--cds-text-inverse)" }}>
               Firedrive Intelligence Assistant
             </span>
-            <span style={{ marginLeft: "auto", fontSize: "0.6875rem", color: "var(--cds-text-placeholder)", display: "flex", alignItems: "center", gap: "4px" }}>
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--cds-support-success)", display: "inline-block" }} />
+            <span
+              style={{
+                marginLeft: "auto",
+                fontSize: "0.6875rem",
+                color: "var(--cds-text-placeholder)",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+            >
+              <span
+                style={{
+                  width: "7px",
+                  height: "7px",
+                  borderRadius: "50%",
+                  background: "var(--cds-support-success)",
+                  display: "inline-block",
+                }}
+              />
               Live data
             </span>
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div
+            style={{
+              height: "500px",
+              overflowY: "auto",
+              padding: "1.25rem 1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.125rem",
+            }}
+          >
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 style={{
                   display: "flex",
                   flexDirection: msg.role === "user" ? "row-reverse" : "row",
-                  gap: "0.5rem",
+                  gap: "0.625rem",
                   alignItems: "flex-start",
                 }}
               >
                 {/* Avatar */}
                 <div
                   style={{
-                    width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0,
-                    background: msg.role === "user" ? "var(--cds-interactive)" : "var(--cds-layer-02)",
-                    border: "1px solid var(--cds-border-subtle-01)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                    background: msg.role === "user" ? "#0f62fe" : "var(--cds-layer-02)",
+                    border: msg.role === "user" ? "none" : "1px solid var(--cds-border-subtle-01)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: msg.role === "user" ? "0 1px 4px rgba(15,98,254,0.3)" : "none",
                   }}
                 >
-                  {msg.role === "user"
-                    ? <UserAvatar size={14} style={{ fill: "#ffffff" }} />
-                    : <Bot size={14} style={{ fill: "var(--cds-interactive)" }} />
-                  }
+                  {msg.role === "user" ? (
+                    <UserAvatar size={15} style={{ fill: "#ffffff" }} />
+                  ) : (
+                    <Bot size={15} style={{ fill: "var(--cds-interactive)" }} />
+                  )}
                 </div>
 
                 {/* Bubble */}
-                <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column", gap: "4px", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
+                <div
+                  style={{
+                    maxWidth: "76%",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "5px",
+                    alignItems: msg.role === "user" ? "flex-end" : "flex-start",
+                  }}
+                >
                   {msg.module && (
                     <Tag type="blue" size="sm" style={{ alignSelf: "flex-start" }}>{msg.module}</Tag>
                   )}
                   <div
                     style={{
-                      padding: "0.625rem 0.875rem",
-                      borderRadius: msg.role === "user" ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
-                      background: msg.role === "user" ? "var(--cds-interactive)" : "var(--cds-layer-02)",
+                      padding: "0.6875rem 0.9375rem",
+                      borderRadius: msg.role === "user" ? "14px 14px 3px 14px" : "14px 14px 14px 3px",
+                      background: msg.role === "user" ? "#0f62fe" : "var(--cds-layer-02)",
                       border: msg.role === "ai" ? "1px solid var(--cds-border-subtle-01)" : "none",
                       fontSize: "0.8125rem",
-                      lineHeight: 1.5,
+                      lineHeight: 1.55,
                       color: msg.role === "user" ? "#ffffff" : "var(--cds-text-primary)",
                       whiteSpace: "pre-wrap",
+                      boxShadow: msg.role === "user"
+                        ? "0 2px 8px rgba(15,98,254,0.25)"
+                        : "0 1px 3px rgba(0,0,0,0.05)",
                     }}
                   >
                     {msg.text}
                     {msg.data && msg.data.length > 0 && <InlineTable rows={msg.data} />}
                     {msg.chart && <MiniBarChart labels={msg.chart.labels} values={msg.chart.values} />}
                   </div>
-                  <span style={{ fontSize: "0.625rem", color: "var(--cds-text-secondary)" }}>
+                  <span
+                    style={{
+                      fontSize: "0.625rem",
+                      color: "var(--cds-text-placeholder)",
+                      letterSpacing: "0.02em",
+                    }}
+                  >
                     {formatTime(msg.ts)}
                   </span>
                 </div>
@@ -425,9 +520,20 @@ export default function IntelligenceDashboard() {
 
             {/* Typing indicator */}
             {loading && (
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "var(--cds-layer-02)", border: "1px solid var(--cds-border-subtle-01)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Bot size={14} style={{ fill: "var(--cds-interactive)" }} />
+              <div style={{ display: "flex", gap: "0.625rem", alignItems: "center" }}>
+                <div
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    background: "var(--cds-layer-02)",
+                    border: "1px solid var(--cds-border-subtle-01)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Bot size={15} style={{ fill: "var(--cds-interactive)" }} />
                 </div>
                 <InlineLoading description="Querying live data…" style={{ fontSize: "0.8125rem" }} />
               </div>
@@ -438,9 +544,11 @@ export default function IntelligenceDashboard() {
           {/* Input row */}
           <div
             style={{
-              padding: "0.75rem 1rem",
+              padding: "0.875rem 1rem",
               borderTop: "1px solid var(--cds-border-subtle-01)",
-              display: "flex", gap: "0.5rem", alignItems: "center",
+              display: "flex",
+              gap: "0.625rem",
+              alignItems: "center",
               background: "var(--cds-layer-01)",
             }}
           >
@@ -452,13 +560,23 @@ export default function IntelligenceDashboard() {
               disabled={loading}
               style={{
                 flex: 1,
-                padding: "0.5rem 0.75rem",
+                minHeight: "40px",
+                padding: "0.5625rem 0.875rem",
                 background: "var(--cds-field-01)",
                 border: "1px solid var(--cds-border-strong-01)",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 fontSize: "0.8125rem",
                 color: "var(--cds-text-primary)",
                 outline: "none",
+                transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#0f62fe";
+                e.currentTarget.style.boxShadow = "0 0 0 2px rgba(15,98,254,0.2)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "var(--cds-border-strong-01)";
+                e.currentTarget.style.boxShadow = "none";
               }}
             />
             <Button
@@ -477,13 +595,30 @@ export default function IntelligenceDashboard() {
           style={{
             background: "var(--cds-layer-01)",
             border: "1px solid var(--cds-border-subtle-01)",
-            borderRadius: "4px",
+            borderRadius: "6px",
             overflow: "hidden",
-            display: "flex", flexDirection: "column",
+            display: "flex",
+            flexDirection: "column",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <div style={{ padding: "0.75rem 1rem", borderBottom: "1px solid var(--cds-border-subtle-01)" }}>
-            <p style={{ margin: 0, fontSize: "0.75rem", fontWeight: 700, color: "var(--cds-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <div
+            style={{
+              padding: "0.875rem 1rem",
+              borderBottom: "1px solid var(--cds-border-subtle-01)",
+              background: "var(--cds-layer-02)",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.6875rem",
+                fontWeight: 700,
+                color: "var(--cds-text-secondary)",
+                textTransform: "uppercase",
+                letterSpacing: "0.07em",
+              }}
+            >
               Quick Questions
             </p>
           </div>
@@ -503,26 +638,59 @@ export default function IntelligenceDashboard() {
                     padding: "0.625rem 0.75rem",
                     background: "transparent",
                     border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
+                    borderLeft: "3px solid transparent",
+                    borderRadius: "0 4px 4px 0",
+                    cursor: loading ? "not-allowed" : "pointer",
                     textAlign: "left",
-                    marginBottom: "2px",
+                    marginBottom: "1px",
+                    transition: "background 0.12s ease, border-left-color 0.12s ease",
+                    opacity: loading ? 0.6 : 1,
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--cds-layer-hover-01)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      (e.currentTarget as HTMLElement).style.background = "var(--cds-layer-hover-01)";
+                      (e.currentTarget as HTMLElement).style.borderLeftColor = "#0f62fe";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                    (e.currentTarget as HTMLElement).style.borderLeftColor = "transparent";
+                  }}
                 >
-                  <span style={{ display: "flex", flexShrink: 0, fill: "var(--cds-interactive)", color: "var(--cds-interactive)" }}>
+                  <span
+                    style={{
+                      display: "flex",
+                      flexShrink: 0,
+                      color: "#0f62fe",
+                    }}
+                  >
                     <Icon size={16} />
                   </span>
-                  <span style={{ fontSize: "0.8rem", color: "var(--cds-text-primary)", lineHeight: 1.3 }}>
+                  <span
+                    style={{
+                      fontSize: "0.8125rem",
+                      color: "var(--cds-text-primary)",
+                      lineHeight: 1.35,
+                      flex: 1,
+                    }}
+                  >
                     {s.label}
                   </span>
-                  <ChevronRight size={14} style={{ fill: "var(--cds-icon-secondary)", marginLeft: "auto", flexShrink: 0 }} />
+                  <ChevronRight size={13} style={{ fill: "var(--cds-icon-secondary)", flexShrink: 0 }} />
                 </button>
               );
             })}
           </div>
-          <div style={{ padding: "0.75rem", borderTop: "1px solid var(--cds-border-subtle-01)", fontSize: "0.6875rem", color: "var(--cds-text-secondary)", lineHeight: 1.4 }}>
+          <div
+            style={{
+              padding: "0.75rem 1rem",
+              borderTop: "1px solid var(--cds-border-subtle-01)",
+              fontSize: "0.6875rem",
+              color: "var(--cds-text-placeholder)",
+              lineHeight: 1.5,
+              background: "var(--cds-layer-02)",
+            }}
+          >
             Queries run against live PostgreSQL database. All data is real.
           </div>
         </div>
