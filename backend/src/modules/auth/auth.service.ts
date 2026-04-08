@@ -41,7 +41,6 @@ export async function login(email: string, password: string) {
     username: user.username,
     roles,
     orgId: user.organizationId,
-    permissions,
   });
 
   const refreshToken = signRefreshToken(user.id);
@@ -105,7 +104,6 @@ export async function refresh(refreshToken: string) {
     username: user.username,
     roles,
     orgId: user.organizationId,
-    permissions,
   });
 
   return { accessToken };

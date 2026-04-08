@@ -7,7 +7,6 @@ export interface JWTPayload {
   username: string;
   roles: string[];
   orgId: string | null;
-  permissions: string[];
 }
 
 export function signAccessToken(payload: JWTPayload): string {
