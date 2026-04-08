@@ -21,5 +21,6 @@ COPY --from=backend-builder /backend/prisma ./prisma
 COPY --from=backend-builder /backend/prisma.config.ts ./prisma.config.ts
 COPY --from=frontend-builder /frontend/dist ./dist/public
 
+# Railway sets PORT; app listens via env.port (see backend/src/config/env.ts)
 EXPOSE 8080
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/seed.js && node dist/index.js"]
+CMD ["node", "dist/index.js"]
