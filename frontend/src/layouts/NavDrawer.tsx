@@ -18,6 +18,7 @@ import {
   UserAvatar,
   Logout,
   Fire,
+  Bot,
 } from "@carbon/icons-react";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -44,6 +45,12 @@ const NAV: NavModule[] = [
     path: "/dashboard",
     icon: Dashboard,
     accentToken: "var(--cds-support-info)",
+  },
+  {
+    label: "Intelligence",
+    path: "/intelligence",
+    icon: Bot,
+    accentToken: "var(--cds-interactive)",
   },
   {
     label: "Fire Administration",

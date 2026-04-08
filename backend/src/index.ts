@@ -18,6 +18,7 @@ import incidentRoutes from "./modules/incident/incident.routes";
 import trainingRoutes from "./modules/training/training.routes";
 import mockDrillRoutes from "./modules/mock-drill/mock-drill.routes";
 import auditRoutes from "./modules/audit/audit.routes";
+import intelligenceRoutes from "./modules/intelligence/intelligence.router";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/api/incident", incidentRoutes);
 app.use("/api/training", trainingRoutes);
 app.use("/api/mock-drill", mockDrillRoutes);
 app.use("/api/audit", auditRoutes);
+app.use("/api/intelligence", intelligenceRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", version: "1.1.0", service: "Firedrive Backend" });

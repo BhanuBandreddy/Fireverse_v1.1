@@ -4,6 +4,7 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import LoginPage from "@/modules/auth/pages/LoginPage";
 import GlobalDashboard from "@/modules/dashboard/pages/GlobalDashboard";
+import IntelligenceDashboard from "@/modules/dashboard/pages/IntelligenceDashboard";
 import FireAdminDashboard from "@/modules/fire-admin/pages/FireAdminDashboard";
 import EmployeeList from "@/modules/fire-admin/pages/EmployeeList";
 import DepartmentList from "@/modules/fire-admin/pages/DepartmentList";
@@ -49,6 +50,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<GlobalDashboard />} />
+        <Route path="/intelligence" element={<IntelligenceDashboard />} />
         <Route path="/fire-admin" element={<FireAdminDashboard />} />
         <Route path="/fire-admin/employees" element={<EmployeeList />} />
         <Route path="/fire-admin/departments" element={<DepartmentList />} />
