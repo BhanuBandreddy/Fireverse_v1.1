@@ -32,8 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// Serve frontend build (production)
-const frontendDist = path.join(__dirname, "../../frontend/dist");
+// Serve frontend build (production) — copied into dist/public during build
+const frontendDist = path.join(__dirname, "public");
 app.use(express.static(frontendDist));
 
 // Routes
@@ -58,7 +58,7 @@ app.use(errorHandler);
 
 // SPA fallback — must be after all API routes
 app.use((_req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(env.port, () => {
