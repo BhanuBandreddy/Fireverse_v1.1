@@ -23,7 +23,23 @@ import intelligenceRoutes from "./modules/intelligence/intelligence.router";
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: env.frontendUrl, credentials: true }));
+
+// Allow: configured FRONTEND_URL, any Railway preview/production subdomain, localhost dev
+const ALLOWED_ORIGINS = [
+  env.frontendUrl,
+  /^https:\/\/[\w-]+\.up\.railway\.app$/,
+  /^http:\/\/localhost:\d+$/,
+];
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // server-to-server / curl
+    const allowed = ALLOWED_ORIGINS.some((o) =>
+      typeof o === "string" ? o === origin : o.test(origin)
+    );
+    cb(allowed ? null : new Error(`CORS: origin ${origin} not allowed`), allowed);
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
