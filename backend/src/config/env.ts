@@ -1,8 +1,15 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+function parsePort(): number {
+  const raw = process.env.PORT;
+  if (raw === undefined || raw === "") return 3001;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n > 0 ? n : 3001;
+}
+
 export const env = {
-  port: parseInt(process.env.PORT ?? "3001"),
+  port: parsePort(),
   nodeEnv: process.env.NODE_ENV ?? "development",
   jwtSecret: process.env.JWT_SECRET ?? "dev-secret-firedrive-min-32-chars!!11",
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET ?? "dev-refresh-firedrive-min-32-chars!!",

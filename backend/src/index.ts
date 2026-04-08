@@ -50,8 +50,16 @@ app.use("/api/mock-drill", mockDrillRoutes);
 app.use("/api/audit", auditRoutes);
 app.use("/api/intelligence", intelligenceRoutes);
 
+const healthPayload = {
+  status: "ok",
+  version: "1.1.0",
+  service: "Firedrive Backend",
+};
+app.get("/health", (_req, res) => {
+  res.json(healthPayload);
+});
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", version: "1.1.0", service: "Firedrive Backend" });
+  res.json(healthPayload);
 });
 
 app.use(errorHandler);
@@ -61,7 +69,8 @@ app.use((_req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(env.port, () => {
+// Bind all interfaces — required for Docker / Railway healthchecks
+app.listen(env.port, "0.0.0.0", () => {
   logger.info(`🔥 Firedrive backend running on port ${env.port}`);
   logger.info(`   Environment: ${env.nodeEnv}`);
   logger.info(`   Frontend URL: ${env.frontendUrl}`);
