@@ -36,7 +36,7 @@ app.use(cors({
     const allowed = ALLOWED_ORIGINS.some((o) =>
       typeof o === "string" ? o === origin : o.test(origin)
     );
-    cb(allowed ? null : new Error(`CORS: origin ${origin} not allowed`), allowed);
+    cb(null, allowed);
   },
   credentials: true,
 }));
